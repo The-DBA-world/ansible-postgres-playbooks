@@ -1,0 +1,11 @@
+all:
+  hosts:
+    myhost1:
+      ansible_host: 192.168.1.101
+      ansible_user: root
+    myhost2:
+      ansible_host: 192.168.1.102
+      ansible_user: root
+    myhost3:
+      ansible_host: 192.168.1.103
+      ansible_user: root
