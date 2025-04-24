@@ -2,20 +2,18 @@ name: Run Ansible Playbook
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Allows manual triggering via GitHub GUI
+  workflow_dispatch:
 jobs:
   run-playbook:
     runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          path: /home/runner/Postgres
       - name: Install Ansible dependencies
         run: |
           sudo dnf install -y ansible-core
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i /home/runner/Postgres/inventory.yml /home/runner/Postgres/pgsql-01-init-binaries.yml
+          ansible-playbook -i ansible-postgres-playbooks/inventory.yml ansible-postgres-playbooks/pgsql-01-init-binaries.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
