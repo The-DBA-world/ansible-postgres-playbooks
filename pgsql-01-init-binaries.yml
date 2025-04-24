@@ -2,30 +2,31 @@
 - name: Install PostgreSQL 15 binaries
   hosts: myhost2
   become: yes
-  vars_files:
-    - host_vars/{{ inventory_hostname }}.yml
+  vars:
+    pg_version: "15"
+    pg_repo_url: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    pg_packages:
+      - "postgresql{{ pg_version }}"
+      - "postgresql{{ pg_version }}-server"
+      - "postgresql{{ pg_version }}-contrib"
+      - "postgresql{{ pg_version }}-libs"
   tasks:
     - name: Install PostgreSQL repository
       dnf:
         name: "{{ pg_repo_url }}"
         state: present
         disable_gpg_check: yes
-      when: pg_repo_url is defined
-
     - name: Check if default PostgreSQL module is enabled
       command: dnf module list postgresql --enabled
       register: pg_module_status
       changed_when: false
       failed_when: false
-
     - name: Disable default PostgreSQL module
       command: dnf module disable postgresql -y
       when: "'enabled' in pg_module_status.stdout"
       changed_when: true
-
     - name: Install PostgreSQL 15 packages
       dnf:
         name: "{{ pg_packages }}"
         state: present
         enablerepo: "pgdg{{ pg_version }}"
-      when: pg_packages is defined
