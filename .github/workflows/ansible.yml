@@ -2,24 +2,20 @@ name: Run Ansible Playbook
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering via GitHub GUI
 jobs:
   run-playbook:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v3
-    - name: Configure SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 400 ~/.ssh/id_rsa
-        ssh-keyscan -H 192.168.1.101 >> ~/.ssh/known_hosts
-        ssh-keyscan -H 192.168.1.102 >> ~/.ssh/known_hosts
-        ssh-keyscan -H 192.168.1.103 >> ~/.ssh/known_hosts
-    - name: Install Ansible
-      run: |
-        sudo apt update
-        sudo apt install -y ansible
-    - name: Run PostgreSQL Binaries Playbook
-      run: ansible-playbook -i inventory.yml pgsql-01-init-binaries.yml
-      env:
-        ANSIBLE_HOST_KEY_CHECKING: False
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: /home/runner/Postgres
+      - name: Install Ansible dependencies
+        run: |
+          sudo dnf install -y ansible-core
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook -i /home/runner/Postgres/inventory.yml /home/runner/Postgres/pgsql-01-init-binaries.yml
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
